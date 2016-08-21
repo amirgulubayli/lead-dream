@@ -6,20 +6,28 @@
 
 $(function() {
   console.log('hello world :o');
-  
-  $.get('/dreams', function(dreams) {
-    dreams.forEach(function(dream) {
-      $('<li></li>').text(dream).appendTo('ul#dreams');
+  var toFind;
+  $.get('/dreams', function(res) {
+    console.log(res.guessNumber);
+    toFind=res.guessNumber;
+    res.numbers.forEach(function(num) {
+      $('<li></li>').text(num).appendTo('ul#dreams');
     });
   });
 
   $('form').submit(function(event) {
     event.preventDefault();
-    dream = $('input').val();
-    $.post('/dreams?' + $.param({dream: dream}), function() {
-      $('<li></li>').text(dream).appendTo('ul#dreams');
+    number = $('input').val();
+    $.post('/dreams?' + $.param({number: number,guessNumber:toFind}), function(res) {
+      console.log(res);
+      $('<li></li>').text(res.status).appendTo('ul#dreams');
       $('input').val('');
       $('input').focus();
+      
+      if(res.status=="correct"){
+        console.log("YESSSSSSS");
+          $('#result').text('well done. You did it in '+res.numbers.length+" tries");
+      }
     });
   });
 

@@ -16,22 +16,37 @@ app.get("/", function (request, response) {
   response.sendFile(__dirname + '/views/index.html');
 });
 
+// Simple in-memory store for now
+var numbers = [];
+
 app.get("/dreams", function (request, response) {
-  response.send(dreams);
+  var res={};
+  res.guessNumber=Math.floor(Math.random() * 101);
+  numbers=[];
+  res.numbers=numbers;
+  response.send(res);
 });
 
 // could also use the POST body instead of query string: http://expressjs.com/en/api.html#req.body
 app.post("/dreams", function (request, response) {
-  dreams.push(request.query.dream);
-  response.sendStatus(200);
+  var number=request.query.number,
+  status="error";
+  numbers.push(number);
+  if (number<request.query.guessNumber){
+    status='cold';
+  }else if (number>request.query.guessNumber)
+  {
+    status='hot';
+  }else if (number==request.query.guessNumber)
+  {
+    status='correct';
+  }
+  console.log(response);
+   
+  response.send({ status: status, number:number, numbers:numbers });
 });
 
-// Simple in-memory store for now
-var dreams = [
-  "Find and count some sheep",
-  "Climb a really tall mountain",
-  "Wash the dishes"
-  ];
+
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
